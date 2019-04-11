@@ -15,8 +15,11 @@ function setup() {
 
   var features = quakes.features;
 let total = features.length;
-  for (var i = 0; i < features.length; i++) {
-    
+  //Agradecimentos
+  createElement('center','Agradecimentos');
+  createElement('center','Daniel Shiffman, The Processing Foundation');
+  createElement('center','and USGS');
+  for (var i = 0; i < features.length; i++) {  
     let time = features[i].properties.time;
     let Mag = features[i].properties.mag;
     let Name = features[i].properties.place;
