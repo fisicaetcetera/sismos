@@ -5,6 +5,7 @@ let angle = 0;
 var total;
 var quakes;
 let n = 0; //numero de terremotos com magnitude escolhida
+let nn = 1;
 let assinatura;
 var lat = [];
 var long = [];
@@ -21,7 +22,8 @@ function preload() {
 }
 
 function setup() {
-  noLoop();
+  frameRate(1);
+  //noLoop();
   //saveJSON(quakes, 'all_day.geo.json', false);
   createCanvas(640, 300, WEBGL);
   assinatura = createGraphics(10, 10);
@@ -30,7 +32,7 @@ function setup() {
   assinatura.textAlign(CENTER);
   assinatura.textSize(150);
   assinatura.text('4.5', 0, 0);
-  createP('O tamanho dos discos representam a magnitudes dos sismos.  Maiores sismos são listados abaixo.')
+  createP('Discos em vermelho representam sismos de magnitude acima de 5.  Abaixo,  lista de sismos acima de magnitude 3.')
   createElement('h3', 'Lista de Terremotos com magnitude acima de 3, nas últimas  24 horas.');
   createElement('h5', 'autor: Enivaldo Bonelli, enivaldob@yahoo.com ');
 
@@ -51,7 +53,7 @@ function setup() {
   if (hours == 0) {
     hours = 12;
   }
-  
+
   createP("Agora é " + dia + "/" + mes + "/" + ano + " " + hours + ":" + minutes);
 
   //Agradecimentos
@@ -59,9 +61,9 @@ function setup() {
   createElement('center', 'Daniel Shiffman,');
   createElement('center', 'The Processing Foundation,');
   createElement('center', 'and the USGS');
-  
+
   for (var i = 0; i < total; i++) {
-    
+
     let time = features[i].properties.time;
     Mag[i] = features[i].properties.mag;
     Name[i] = features[i].properties.place;
@@ -104,8 +106,17 @@ function draw() {
     translate(xlong, yylat);
     texture(assinatura);
     rotateX(1.5);
-    fill(255, 255, 0, 88)
-    cylinder(2 * Mag[j], 5);
-    pop();
+    if (Mag[j] > 5) {
+      fill(255, 0, 0, 222);
+    } else {
+      fill(255, 255, 0, 88)
     }
+    cylinder(nn * Mag[j], 5);
+    pop();
+  }
+  if (nn > 2) {
+    nn--;
+  } else {
+    nn++;
+  }
 }
