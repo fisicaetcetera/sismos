@@ -1,4 +1,5 @@
-// Nessa versão, colocarei a Terra, para desenhar os terremotos nela.
+// Quakes every 24 hours mapped on flat earth.
+// Most recent effort: including control bottons
 // USGS Earthquake API:
 //   https://earthquake.usgs.gov/fdsnws/event/1/#methods
 let angle = 0;
@@ -12,6 +13,8 @@ var long = [];
 var hora = [];
 var Mag = []
 var Name = [];
+var h5;
+var h6;
 
 function preload() {
 
@@ -30,10 +33,12 @@ function setup() {
   assinatura.background(255, 55);
   assinatura.fill(0);
   assinatura.textAlign(CENTER);
-  assinatura.textSize(150);
+  assinatura.textSize(75);
   assinatura.text('4.5', 0, 0);
+  
+  h4 = createElement('h5', 'Declinacao estimada da Lua : ' + declinacao());
   createP('Discos em vermelho representam sismos de magnitude acima de 5.  Abaixo,  lista de sismos acima de magnitude 3.')
-  createElement('h3', 'Lista de Terremotos com magnitude acima de 3, nas últimas  24 horas.');
+  h5 = createElement('h5', 'Lista de Terremotos com magnitude acima de 3, nas últimas  24 horas.');
   createElement('h5', 'autor: Enivaldo Bonelli, enivaldob@yahoo.com ');
 
   var features = quakes.features;
@@ -53,7 +58,6 @@ function setup() {
   if (hours == 0) {
     hours = 12;
   }
-
   createP("Agora é " + dia + "/" + mes + "/" + ano + " " + hours + ":" + minutes);
 
   //Agradecimentos
@@ -93,12 +97,15 @@ function setup() {
 
 function draw() {
 
+  clear();
+  noStroke();
   push();
   texture(terra);
   translate(0, 0);
   plane(640, 300);
   pop();
-  for (var j = total; j > 0; j--) {
+  for (var j = total; j > -1; j--) {
+    console.log(j);
     let yylat = map(lat[j], 90, -90, -height / 2, height / 2, true);
     let xlong = map(long[j], -180, 180, -width / 2, width / 2, true);
     push();
@@ -107,9 +114,9 @@ function draw() {
     texture(assinatura);
     rotateX(1.5);
     if (Mag[j] > 5) {
-      fill(255, 0, 0, 222);
+      fill(255, 0, 0, 225);
     } else {
-      fill(255, 255, 0, 88)
+      fill(125, 255, 150, 50)
     }
     cylinder(nn * Mag[j], 5);
     pop();
@@ -119,4 +126,27 @@ function draw() {
   } else {
     nn++;
   }
+  h4.html('Declinacao estimada da Lua : ' + declinacao());
+}
+
+
+function declinacao() {
+
+
+  // tempo desde 200001010000
+  let timestamp = new Date().getTime();
+  let stampj2000 = (new Date('2000-01-01T12:00:00Z')).getTime();
+  //console.log('stampj2000 = ', stampj2000);
+  let epoca = (timestamp - stampj2000) / 1000;
+  //console.log('epoca = ' + epoca);
+  let numdias = epoca / 86400;
+  //console.log('numero de dias = ' + numdias);
+  let u = numdias - 0.48 * sin(TWO_PI * (numdias - 3.45) / 27.5545);
+  //console.log(' u = ' + u);
+  let delta1 = 23.4 * sin(TWO_PI * (u - 10.75) / 27.32158);
+  let delta2 = 5.1 * sin(TWO_PI * (u - 20.15) / 27.21222);
+  //console.log('delta1 = ' + delta1);
+  //console.log('delta2 = ' + delta2);
+  //console.log(delta1 + delta2);
+  return (delta1 + delta2).toFixed(5);
 }
