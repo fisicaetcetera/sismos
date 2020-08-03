@@ -1,5 +1,6 @@
 // Quakes every 24 hours mapped on flat earth.
-// Most recent effort: including control bottons
+// Calculates and writes the moon declination
+// This version: including the moon en 3D, with texture.
 // USGS Earthquake API:
 //   https://earthquake.usgs.gov/fdsnws/event/1/#methods
 let angle = 0;
@@ -15,10 +16,12 @@ var Mag = []
 var Name = [];
 var h5;
 var h6;
+let degtorad = 57.296;
 
 function preload() {
 
   terra = loadImage('earthmap1k.jpg');
+  moon = loadImage('moontexture.jpg');
   //let url = 'all_day.geo.json';
   let url = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson';
   quakes = loadJSON(url);
@@ -104,6 +107,18 @@ function draw() {
   translate(0, 0);
   plane(640, 300);
   pop();
+  console.log(width, height);
+  //desenha a lua
+  push()
+  let ylua = map(declinacao(), 90, -90, -height / 2, height / 2, true);
+  rotateY(frameCount/10000);
+  translate(-38, ylua, 50);
+  texture(moon);
+  sphere(11);
+
+  pop();
+  //
+  
   for (var j = total; j > -1; j--) {
     console.log(j);
     let yylat = map(lat[j], 90, -90, -height / 2, height / 2, true);
