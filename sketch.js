@@ -4,6 +4,7 @@
 // USGS Earthquake API:
 //   https://earthquake.usgs.gov/fdsnws/event/1/#methods
 let angle = 0;
+let angulo;
 var total;
 var quakes;
 let n = 0; //numero de terremotos com magnitude escolhida
@@ -16,7 +17,9 @@ var Mag = []
 var Name = [];
 var h5;
 var h6;
+var h3;
 let degtorad = 57.296;
+let dia, hours, minutes, seconds, mes, ano;
 
 function preload() {
 
@@ -28,7 +31,9 @@ function preload() {
 }
 
 function setup() {
+
   frameRate(1);
+  angulo = random(0.,3.14);
   //noLoop();
   //saveJSON(quakes, 'all_day.geo.json', false);
   createCanvas(640, 300, WEBGL);
@@ -38,8 +43,12 @@ function setup() {
   assinatura.textAlign(CENTER);
   assinatura.textSize(75);
   assinatura.text('4.5', 0, 0);
-  
+
   h4 = createElement('h5', 'Declinacao estimada da Lua : ' + declinacao());
+
+  tempo(); //obtem a data e hora
+  h3 = createElement('h5', (dia + "/" + mes + "/" + ano + " " + hours + ":" + minutes + ":" + seconds));
+
   createP('Discos em vermelho representam sismos de magnitude acima de 5.  Abaixo,  lista de sismos acima de magnitude 3.')
   h5 = createElement('h5', 'Lista de Terremotos com magnitude acima de 3, nas últimas  24 horas.');
   createElement('h5', 'autor: Enivaldo Bonelli, enivaldob@yahoo.com ');
@@ -49,10 +58,12 @@ function setup() {
   total = features.length;
 
   //Imprime a hora
+
   var currentTime = new Date();
   dia = currentTime.getDate();
   hours = currentTime.getHours();
   minutes = currentTime.getMinutes();
+  seconds = currentTime.getSeconds();
   mes = currentTime.getMonth() + 1;
   ano = currentTime.getFullYear();
   if (minutes < 10) {
@@ -61,7 +72,6 @@ function setup() {
   if (hours == 0) {
     hours = 12;
   }
-  createP("Agora é " + dia + "/" + mes + "/" + ano + " " + hours + ":" + minutes);
 
   //Agradecimentos
   createElement('center', 'Agradecimentos a');
@@ -100,25 +110,32 @@ function setup() {
 
 function draw() {
 
-  clear();
+  //clear();
   noStroke();
+
+  //Imprime a hora
+  tempo();
+  h3.html(dia + "/" + mes + "/" + ano + " " + hours + ":" + minutes + ":" + seconds);
+  //  
   push();
   texture(terra);
   translate(0, 0);
   plane(640, 300);
   pop();
-  console.log(width, height);
+  //console.log(width, height);
   //desenha a lua
-  push()
-  let ylua = map(declinacao(), 90, -90, -height / 2, height / 2, true);
-  rotateY(frameCount/10000);
-  translate(-38, ylua, 50);
-  texture(moon);
-  sphere(11);
 
+  let ylua = map(declinacao(), 90, -90, -height / 2, height / 2, true);
+
+  push();
+
+  translate(-25, ylua, 70);
+  rotateY(angulo);
+  texture(moon);
+  sphere(15);
   pop();
   //
-  
+
   for (var j = total; j > -1; j--) {
     console.log(j);
     let yylat = map(lat[j], 90, -90, -height / 2, height / 2, true);
@@ -144,6 +161,21 @@ function draw() {
   h4.html('Declinacao estimada da Lua : ' + declinacao());
 }
 
+function tempo() {
+  var currentTime = new Date();
+  dia = currentTime.getDate();
+  hours = currentTime.getHours();
+  minutes = currentTime.getMinutes();
+  seconds = currentTime.getSeconds();
+  mes = currentTime.getMonth() + 1;
+  ano = currentTime.getFullYear();
+  if (minutes < 10) {
+    minutes = "0" + minutes;
+  }
+  if (hours == 0) {
+    hours = 12;
+  }
+}
 
 function declinacao() {
 
