@@ -1,6 +1,7 @@
 // Quakes every 24 hours mapped on flat earth.
 // Calculates and writes the moon declination
 // This version: including the moon en 3D, with texture.
+//mostly recent:working on sun's longitudinal motion, no declination.
 // USGS Earthquake API:
 //   https://earthquake.usgs.gov/fdsnws/event/1/#methods
 let angle = 0;
@@ -20,11 +21,16 @@ var h6;
 var h3;
 let degtorad = 57.296;
 let dia, hours, minutes, seconds, mes, ano;
+let sunlong;
+let UT, TZ;
+let factor = 1;
+let radius;
 
 function preload() {
 
   terra = loadImage('earthmap1k.jpg');
   moon = loadImage('moonmap1k.jpg');
+  sol = loadImage('sun.jpg');
   //let url = 'all_day.geo.json';
   let url = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson';
   quakes = loadJSON(url);
@@ -33,7 +39,7 @@ function preload() {
 function setup() {
 
   frameRate(1);
-  angulo = random(0.,3.14);
+  angulo = random(0., 3.14);
   //noLoop();
   //saveJSON(quakes, 'all_day.geo.json', false);
   createCanvas(640, 300, WEBGL);
@@ -56,22 +62,6 @@ function setup() {
   var features = quakes.features;
   var geometry = quakes.geometry;
   total = features.length;
-
-  //Imprime a hora
-
-  var currentTime = new Date();
-  dia = currentTime.getDate();
-  hours = currentTime.getHours();
-  minutes = currentTime.getMinutes();
-  seconds = currentTime.getSeconds();
-  mes = currentTime.getMonth() + 1;
-  ano = currentTime.getFullYear();
-  if (minutes < 10) {
-    minutes = "0" + minutes;
-  }
-  if (hours == 0) {
-    hours = 12;
-  }
 
   //Agradecimentos
   createElement('center', 'Agradecimentos a');
@@ -126,18 +116,32 @@ function draw() {
   //desenha a lua
 
   let ylua = map(declinacao(), 90, -90, -height / 2, height / 2, true);
-
+  radius = 10 * factor;
   push();
 
   translate(-25, ylua, 70);
   rotateY(angulo);
   texture(moon);
-  sphere(15);
+  sphere(radius);
   pop();
-  //
+  
+  // sol
+  sunlong = (-UT/24 * 360);
+  if(UT > 12){
+    sunlong += 360; 
+  }
+    let xSol = map(sunlong, 180, -180, -width / 2, width / 2, true);
+  push()
+  translate(xSol, 0, 40);
+  rotateY(angulo);
+  texture(sol);
+  //fill(200,255,0,10);
+  sphere(radius);
+  pop();
+  console.log('sunlong = ' + sunlong);
 
   for (var j = total; j > -1; j--) {
-    console.log(j);
+    //console.log(j);
     let yylat = map(lat[j], 90, -90, -height / 2, height / 2, true);
     let xlong = map(long[j], -180, 180, -width / 2, width / 2, true);
     push();
@@ -169,6 +173,13 @@ function tempo() {
   seconds = currentTime.getSeconds();
   mes = currentTime.getMonth() + 1;
   ano = currentTime.getFullYear();
+  tempoNodia = (hours*3600 + minutes * 60 + seconds)/3600; 
+  TZ = currentTime.getTimezoneOffset()/60;
+  UT = tempoNodia + TZ;
+  console.log('TZ = ' +TZ + ',  UT = ' + UT );
+  if (seconds < 10) {
+    seconds = "0" + seconds;
+  }
   if (minutes < 10) {
     minutes = "0" + minutes;
   }
@@ -178,7 +189,6 @@ function tempo() {
 }
 
 function declinacao() {
-
 
   // tempo desde 200001010000
   let timestamp = new Date().getTime();
@@ -196,4 +206,16 @@ function declinacao() {
   //console.log('delta2 = ' + delta2);
   //console.log(delta1 + delta2);
   return (delta1 + delta2).toFixed(5);
+}
+
+
+function mousePressed() {
+  console.log(factor);
+  if (factor === 1) {
+    factor = 3;
+  } else {
+    factor = 1;
+  }
+  console.log(factor);
+  return false;
 }
