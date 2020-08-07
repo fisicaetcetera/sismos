@@ -21,7 +21,7 @@ var h6;
 var h3;
 let degtorad = 57.296;
 let dia, hours, minutes, seconds, mes, ano;
-let sunlong;
+let sunlong, sunlat;
 let UT, TZ;
 let factor = 1;
 let radius;
@@ -118,27 +118,32 @@ function draw() {
   let ylua = map(declinacao(), 90, -90, -height / 2, height / 2, true);
   radius = 10 * factor;
   push();
-
-  translate(-25, ylua, 70);
+  let xMoon = 82;
+  //let xMoon = map(-163.5, -180, +180, -width / 2, width / 2, true);
+translate(xMoon, ylua, 70);
   rotateY(angulo);
   texture(moon);
   sphere(radius);
   pop();
   
   // sol
-  sunlong = (-UT/24 * 360);
+  sunlat = 17; //graus falta equacao
+  sunlong = (12-UT/24 * 360);
   if(UT > 12){
-    sunlong += 360; 
+    sunlong += 180; 
   }
-    let xSol = map(sunlong, 180, -180, -width / 2, width / 2, true);
+    let xSol = map(sunlong, -180, +180, -width / 2, width / 2, true);
+
+    let ySol = map(sunlat, 90, -90, -height / 2, height / 2, true);
+  
   push()
-  translate(xSol, 0, 40);
+  translate(xSol, ySol, 40);
   rotateY(angulo);
   texture(sol);
   //fill(200,255,0,10);
   sphere(radius);
   pop();
-  console.log('sunlong = ' + sunlong);
+  console.log('sunlong = ' + sunlong + 'lualat = ' + xMoon);
 
   for (var j = total; j > -1; j--) {
     //console.log(j);
