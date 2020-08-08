@@ -21,7 +21,7 @@ var h6;
 var h3;
 let degtorad = 57.296;
 let dia, hours, minutes, seconds, mes, ano;
-let sunlong, sunlat;
+let sunlong, sunlat, moonLong = 29;
 let UT, TZ;
 let factor = 1;
 let radius;
@@ -39,6 +39,7 @@ function preload() {
 function setup() {
 
   frameRate(1);
+
   angulo = random(0., 3.14);
   //noLoop();
   //saveJSON(quakes, 'all_day.geo.json', false);
@@ -117,9 +118,11 @@ function draw() {
 
   let ylua = map(declinacao(), 90, -90, -height / 2, height / 2, true);
   radius = 10 * factor;
+  //push();
+  console.log('moon long inicial = ' + moonLong)
+  moonLong = moonLong - 0.0043;
+  let xMoon = map(moonLong, -180, +180, -width / 2, width / 2, true);
   push();
-  let xMoon = 82;
-  //let xMoon = map(-163.5, -180, +180, -width / 2, width / 2, true);
 translate(xMoon, ylua, 70);
   rotateY(angulo);
   texture(moon);
@@ -128,9 +131,10 @@ translate(xMoon, ylua, 70);
   
   // sol
   sunlat = 17; //graus falta equacao
-  sunlong = (12-UT/24 * 360);
-  if(UT > 12){
-    sunlong += 180; 
+  sunlong = ((12-UT)/24 * 360);
+  console.log('sunlong = ...', + sunlong);
+  if(sunlong < -180){
+    sunlong += 360; 
   }
     let xSol = map(sunlong, -180, +180, -width / 2, width / 2, true);
 
@@ -143,7 +147,7 @@ translate(xMoon, ylua, 70);
   //fill(200,255,0,10);
   sphere(radius);
   pop();
-  console.log('sunlong = ' + sunlong + 'lualat = ' + xMoon);
+  console.log('sunlong = ' + sunlong + 'lualong = ' + xMoon);
 
   for (var j = total; j > -1; j--) {
     //console.log(j);
