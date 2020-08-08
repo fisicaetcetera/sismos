@@ -1,7 +1,9 @@
 // Quakes every 24 hours mapped on flat earth.
 // Calculates and writes the moon declination
 // This version: including the moon en 3D, with texture.
-//mostly recent:working on sun's longitudinal motion, no declination.
+//mostly recent:working on sun's longitudinal motion, no declination, ok.
+//now including moons longitudinal motion...
+
 // USGS Earthquake API:
 //   https://earthquake.usgs.gov/fdsnws/event/1/#methods
 let angle = 0;
@@ -10,7 +12,7 @@ var total;
 var quakes;
 let n = 0; //numero de terremotos com magnitude escolhida
 let nn = 1;
-let assinatura;
+//let assinatura;
 var lat = [];
 var long = [];
 var hora = [];
@@ -20,8 +22,11 @@ var h5;
 var h6;
 var h3;
 let degtorad = 57.296;
+let currentTime;
 let dia, hours, minutes, seconds, mes, ano;
-let sunlong, sunlat, moonLong = 29;
+let sunlong, sunlat, moonLong = -93;
+let moonSpeed;
+let moonStamp = 1596854700000; //timestamp, seconds since 2020/08/08/03:26:00
 let UT, TZ;
 let factor = 1;
 let radius;
@@ -39,17 +44,16 @@ function preload() {
 function setup() {
 
   frameRate(1);
-
-  angulo = random(0., 3.14);
+  angulo = random(0,360);
   //noLoop();
   //saveJSON(quakes, 'all_day.geo.json', false);
   createCanvas(640, 300, WEBGL);
-  assinatura = createGraphics(10, 10);
-  assinatura.background(255, 55);
-  assinatura.fill(0);
-  assinatura.textAlign(CENTER);
-  assinatura.textSize(75);
-  assinatura.text('4.5', 0, 0);
+  //assinatura = createGraphics(10, 10);
+  //assinatura.background(255, 55);
+  //assinatura.fill(0);
+  //assinatura.textAlign(CENTER);
+  //assinatura.textSize(75);
+  //assinatura.text('4.5', 0, 0);
 
   h4 = createElement('h5', 'Declinacao estimada da Lua : ' + declinacao());
 
@@ -101,9 +105,10 @@ function setup() {
 
 function draw() {
 
-  //clear();
+  background(0);
+  //directionalLight(255,255,0,0, 0, -1)
   noStroke();
-
+  angulo += 0.01;
   //Imprime a hora
   tempo();
   h3.html(dia + "/" + mes + "/" + ano + " " + hours + ":" + minutes + ":" + seconds);
@@ -115,15 +120,21 @@ function draw() {
   pop();
   //console.log(width, height);
   //desenha a lua
-
+  
   let ylua = map(declinacao(), 90, -90, -height / 2, height / 2, true);
   radius = 10 * factor;
   //push();
-  console.log('moon long inicial = ' + moonLong)
-  moonLong = moonLong - 0.0043;
-  let xMoon = map(moonLong, -180, +180, -width / 2, width / 2, true);
+  moonSpeed = -360/88200;
+  Now = new Date();
+  let deltaT = (Now - moonStamp)/1000;
+  let moonLong = moonSpeed * deltaT;
+  while(moonLong <-180){
+    moonLong += 360;
+  }
+  console.log('Lua longitude = ' + moonLong)
+  //let xMoon = map(moonLong, -180, +180, -width / 2, width / 2, true);
   push();
-translate(xMoon, ylua, 70);
+translate(moonLong, ylua, 70);
   rotateY(angulo);
   texture(moon);
   sphere(radius);
@@ -141,22 +152,23 @@ translate(xMoon, ylua, 70);
     let ySol = map(sunlat, 90, -90, -height / 2, height / 2, true);
   
   push()
-  translate(xSol, ySol, 40);
+  translate(xSol, ySol, 70);
   rotateY(angulo);
   texture(sol);
-  //fill(200,255,0,10);
   sphere(radius);
+
   pop();
-  console.log('sunlong = ' + sunlong + 'lualong = ' + xMoon);
+  console.log('sunlong = ' + sunlong + 'lualong = ' + moonLong);
+  //spotLight(222,111,0, xSol, ySol, 70, -1, 1, 1)
+  //pointLight(250, 250, 250, xMoon, ylua, 50);
 
   for (var j = total; j > -1; j--) {
-    //console.log(j);
+    console.log(j);
     let yylat = map(lat[j], 90, -90, -height / 2, height / 2, true);
     let xlong = map(long[j], -180, 180, -width / 2, width / 2, true);
     push();
     //translate(0,-85)
     translate(xlong, yylat);
-    texture(assinatura);
     rotateX(1.5);
     if (Mag[j] > 5) {
       fill(255, 0, 0, 225);
@@ -175,7 +187,7 @@ translate(xMoon, ylua, 70);
 }
 
 function tempo() {
-  var currentTime = new Date();
+  currentTime = new Date();
   dia = currentTime.getDate();
   hours = currentTime.getHours();
   minutes = currentTime.getMinutes();
@@ -220,7 +232,7 @@ function declinacao() {
 
 function mousePressed() {
   console.log(factor);
-  if (factor === 1) {
+  if (factor == 1) {
     factor = 3;
   } else {
     factor = 1;
