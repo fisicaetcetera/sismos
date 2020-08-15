@@ -25,6 +25,7 @@ let degtorad = 57.296;
 let currentTime;
 let dia, hours, minutes, seconds, mes, ano;
 let sunlong, sunlat, moonLong = -93;
+let sundecli = 14;
 let moonSpeed;
 let moonStamp = 1596854700000; //timestamp, seconds since 2020/08/08/03:26:00
 let UT, TZ;
@@ -141,7 +142,7 @@ translate(moonLong, ylua, 70);
   pop();
   
   // sol
-  sunlat = 17; //graus falta equacao
+  sunlat = sundecli; //graus falta equacao
   sunlong = ((12-UT)/24 * 360);
   console.log('sunlong = ...', + sunlong);
   if(sunlong < -180){
