@@ -1,3 +1,7 @@
+//Working very well - going to improve the graph now.
+//Will create my 'map()' since the old one is not working
+// OK.  Now need to plot correctly sun and moon on the map.  3D not a good idea yet.
+//date 201223-ra and dec ok for sun moon.  Need to find lat long of overead sun, moon
 // Quakes every 24 hours mapped on flat earth.
 // Calculates and writes the moon declination
 // This version: including the moon en 3D, with texture.
@@ -13,10 +17,10 @@ var quakes;
 let n = 0; //numero de terremotos com magnitude escolhida
 let nn = 1;
 //let assinatura;
-var lat = [];
+var latsys = [];
 var long = [];
 var hora = [];
-var Mag = []
+var Mag = [];
 var Name = [];
 var h5;
 var h6;
@@ -24,13 +28,73 @@ var h3;
 let degtorad = 57.296;
 let currentTime;
 let dia, hours, minutes, seconds, mes, ano;
-let sunlong, sunlat, moonLong = -93;
-let sundecli = 14;
-let moonSpeed;
-let moonStamp = 1596854700000; //timestamp, seconds since 2020/08/08/03:26:00
-let UT, TZ;
-let factor = 1;
+let TZ;
+let factor = 0;
 let radius;
+let declination;
+//===== do moontrack
+
+
+let lon;
+let dlon;
+let lonloc;
+let lonlocs;
+let ra, dec;
+let UT;
+let twopi;
+let degs;
+let rads;
+// LUA
+let am = 60.2666; //(Earth radii)  == OK 
+let ecm = 0.0549; // == OK, excentricidade
+let im = 5.1454; //== OK
+let Nm; //longitude of the ascending node 
+let Mm;
+let vm; // true anomaly, é calculada abaixo
+let d; //days since the date of the elements
+//let n = 0.523998; //daily motion
+let ne = 0.985611; //same as n, for earth
+//let L = 82.9625; //mean longitude
+let Le = 324.5489; //same as L, for earth
+//let p = 336.322; //longitude of the perihelion, degrees
+let we = 282; //same as p, for earth
+//let e = 0.093346; //eccentricity of orbit
+let ee = 0.016709; // same as e, for earth
+//let a = 1.523762; //semi-major axis
+let ae = 1.000; //same as a, for earth
+//let o = 49.5574; //longitude of ascending node, degrees
+
+let oe = 0.0; //same as o, for earth
+let i = 1.8496; // inclination of plane of orbit, degrees
+let ie = 0.0; // same as i, for earth
+
+let m; //  Mean anomaly
+let me;
+
+
+
+let ve;
+let r; // length of radius vector of the planet
+let re;
+// ecliptic coordinates of a body - cartesian
+let X, Y, Z;
+// ecliptic c//
+//
+// coordinates for Earth - cartesian
+let Xe, Ye, Ze;
+// distance of a body to Earth:
+let distance;
+//
+//      SOL
+let Ns = 0;
+let isun = 0;
+let asun = 1;
+let ecs; // ecentricidade, calculada abaixo 
+let Ms;
+let RAs, Decs, RA, Dec; //sun, moon
+let Ls; //mean longitude of the sun
+
+//======
 
 function preload() {
 
@@ -43,12 +107,21 @@ function preload() {
 }
 
 function setup() {
+  //do outro programa  ==========
 
+  twopi = TWO_PI;
+  degs = 180 / PI;
+  rads = 1 / degs;
+  //
+
+  //======
   frameRate(1);
-  angulo = random(0,360);
+  angulo = random(0, 360);
   //noLoop();
   //saveJSON(quakes, 'all_day.geo.json', false);
+  //
   createCanvas(640, 300, WEBGL);
+  //
   //assinatura = createGraphics(10, 10);
   //assinatura.background(255, 55);
   //assinatura.fill(0);
@@ -56,7 +129,7 @@ function setup() {
   //assinatura.textSize(75);
   //assinatura.text('4.5', 0, 0);
 
-  h4 = createElement('h5', 'Declinacao estimada da Lua : ' + declinacao());
+  h4 = createElement('h5', 'Declinacao estimada da Lua : ' + 1);
 
   tempo(); //obtem a data e hora
   h3 = createElement('h5', (dia + "/" + mes + "/" + ano + " " + hours + ":" + minutes + ":" + seconds));
@@ -81,9 +154,9 @@ function setup() {
     Mag[i] = features[i].properties.mag;
     Name[i] = features[i].properties.place;
     //====================
-    lat[i] = features[i].geometry.coordinates[1];
+    latsys[i] = features[i].geometry.coordinates[1];
     long[i] = features[i].geometry.coordinates[0];
-    //print(long, lat);
+    //print(long, latsys);
     //====================
     var sismoTempo = new Date(time);
     var sismoHora = sismoTempo.getHours();
@@ -103,9 +176,9 @@ function setup() {
     }
   }
 }
-
+///////////////////////  draw()
 function draw() {
-
+  declination = Dec;
   background(0);
   //directionalLight(255,255,0,0, 0, -1)
   noStroke();
@@ -114,6 +187,7 @@ function draw() {
   tempo();
   h3.html(dia + "/" + mes + "/" + ano + " " + hours + ":" + minutes + ":" + seconds);
   //  
+    rotateX(factor * 0.7);
   push();
   texture(terra);
   translate(0, 0);
@@ -121,54 +195,63 @@ function draw() {
   pop();
   //console.log(width, height);
   //desenha a lua
-  
-  let ylua = map(declinacao(), 90, -90, -height / 2, height / 2, true);
-  radius = 10 * factor;
-  //push();
-  moonSpeed = -360/88200;
-  Now = new Date();
-  let deltaT = (Now - moonStamp)/1000;
-  let moonLong = moonSpeed * deltaT;
-  while(moonLong <-180){
-    moonLong += 360;
-  }
-  console.log('Lua longitude = ' + moonLong)
-  //let xMoon = map(moonLong, -180, +180, -width / 2, width / 2, true);
+  //declination = declinacao();
+
+  let ylua = map(declination, 90, -90, -height / 2, height / 2);
+  console.log('declination, ylua = ', declination, ylua);
+
+  d = numeroDeDias();
+  //  SOL
+  ws = FNrange((282.9404 + 4.70935E-05 * d) * rads);
+  ecs = 0.016709 - 1.151E-09 * d;
+  Ms = FNrange((356.047 + 0.9856002585 * d) * rads);
+  Ls = FNrange(Ms + ws); //Mean Longitude of the Sun  (Ns=0)
+  console.log('mean longitude of sun = ', Ls * degs);
+  // console.log('numero de dias desde elementos = ' + d);
+  //
+  Moon(); //get RA, Dec and range for Moon
+  // console.log('RA = ', ra * degs / 15);
+  // console.log('DEC = ', dec * degs);
+  console.log('lon, lat = ', lon * degs, lat * degs);
+
+  //====
+  moonlong = lonloc;
+  console.log('moonlong = ', moonlong);
+  console.log('Lua longitude = ', moonlong)
+  //let xMoon = map(moonLong, -180, 180, -width / 2, width / 2, true);
+  let xMoon = (moonlong + 180) * 640 / 360 - width / 2;
+  // console.log('width = ', width);
+  // console.log('xMoon = ', xMoon);
   push();
-translate(moonLong, ylua, 70);
+  translate(xMoon, ylua, 5);
   rotateY(angulo);
   texture(moon);
-  sphere(radius);
+  sphere(10);
   pop();
-  
-  // sol
-  sunlat = sundecli; //graus falta equacao
-  sunlong = ((12-UT)/24 * 360);
-  console.log('sunlong = ...', + sunlong);
-  if(sunlong < -180){
-    sunlong += 360; 
-  }
-    let xSol = map(sunlong, -180, +180, -width / 2, width / 2, true);
 
-    let ySol = map(sunlat, 90, -90, -height / 2, height / 2, true);
-  
+  // sol
+  sunlat = Decs; //
+  sunlong = ((12 - UT) / 24 * 360);
+  //console.log('sunlong = ...', + sunlong);
+  if (sunlong < -180) {
+    sunlong += 360;
+  }
+  let xSol = map(lonlocs, -180, +180, -width / 2, width / 2);
+
+  let ySol = map(Decs, 90, -90, -height / 2, height / 2);
+
   push()
-  translate(xSol, ySol, 70);
+  translate(xSol, ySol, 5);
   rotateY(angulo);
   texture(sol);
-  sphere(radius);
+  sphere(10);
 
   pop();
-  console.log('sunlong = ' + sunlong + 'lualong = ' + moonLong);
-  //spotLight(222,111,0, xSol, ySol, 70, -1, 1, 1)
-  //pointLight(250, 250, 250, xMoon, ylua, 50);
 
   for (var j = total; j > -1; j--) {
-    console.log(j);
-    let yylat = map(lat[j], 90, -90, -height / 2, height / 2, true);
+    let yylat = map(latsys[j], 90, -90, -height / 2, height / 2, true);
     let xlong = map(long[j], -180, 180, -width / 2, width / 2, true);
     push();
-    //translate(0,-85)
     translate(xlong, yylat);
     rotateX(1.5);
     if (Mag[j] > 5) {
@@ -184,7 +267,8 @@ translate(moonLong, ylua, 70);
   } else {
     nn++;
   }
-  h4.html('Declinacao estimada da Lua : ' + declinacao());
+  //h4.html('Declinacao estimada da Lua : ' + Dec);
+  h4.html('Declinacao estimada do Sol: ' + Decs);
 }
 
 function tempo() {
@@ -195,10 +279,10 @@ function tempo() {
   seconds = currentTime.getSeconds();
   mes = currentTime.getMonth() + 1;
   ano = currentTime.getFullYear();
-  tempoNodia = (hours*3600 + minutes * 60 + seconds)/3600; 
-  TZ = currentTime.getTimezoneOffset()/60;
+  tempoNodia = (hours * 3600 + minutes * 60 + seconds) / 3600;
+  TZ = currentTime.getTimezoneOffset() / 60;
   UT = tempoNodia + TZ;
-  console.log('TZ = ' +TZ + ',  UT = ' + UT );
+  console.log('TZ = ' + TZ + ',  UT = ' + UT);
   if (seconds < 10) {
     seconds = "0" + seconds;
   }
@@ -210,34 +294,227 @@ function tempo() {
   }
 }
 
-function declinacao() {
-
-  // tempo desde 200001010000
-  let timestamp = new Date().getTime();
-  let stampj2000 = (new Date('2000-01-01T12:00:00Z')).getTime();
-  //console.log('stampj2000 = ', stampj2000);
-  let epoca = (timestamp - stampj2000) / 1000;
-  //console.log('epoca = ' + epoca);
-  let numdias = epoca / 86400;
-  //console.log('numero de dias = ' + numdias);
-  let u = numdias - 0.48 * sin(TWO_PI * (numdias - 3.45) / 27.5545);
-  //console.log(' u = ' + u);
-  let delta1 = 23.4 * sin(TWO_PI * (u - 10.75) / 27.32158);
-  let delta2 = 5.1 * sin(TWO_PI * (u - 20.15) / 27.21222);
-  //console.log('delta1 = ' + delta1);
-  //console.log('delta2 = ' + delta2);
-  //console.log(delta1 + delta2);
-  return (delta1 + delta2).toFixed(5);
-}
-
-
 function mousePressed() {
-  console.log(factor);
-  if (factor == 1) {
-    factor = 3;
+  //console.log(factor of rotation);
+  if (factor == 0) {
+    factor = 2;
   } else {
-    factor = 1;
+    factor = 0;
   }
-  console.log(factor);
+  //console.log(factor);
   return false;
 }
+
+//
+
+//************** FUNCTIONS ****************
+
+//
+//======function Moon =======
+function Moon() {
+
+  Nm = FNrange((125.1228 - 0.0529538083 * d) * rads); //Long ascending node
+  im = 5.1454 * rads; // inclination of orbit 
+  wm = FNrange((318.0634 + 0.1643573223 * d) * rads); //argm of periapsis
+  ws = FNrange((282.9404 + 4.70935e-5 * d) * rads);
+  am = 60.2666 //semi-major axis (Earth radii)
+  as = 1; //(AU)
+  ecm = 0.0549*rads;
+  ecs = (0.016709 - 1.151E-9 * d) *rads; //
+  Mm = FNrange((115.3654 + 13.0649929509 * d) * rads); // mean anomaly
+  Ms = FNrange((356.0470 + 0.9856002585 * d) * rads);
+  Em = Mm + ecm * sin(Mm) * (1 + ecm * cos(Mm)); //eccentric anomaly
+  //console.log('Em = ', Em, Em * degs)
+  Es = Ms + ecs * sin(Ms) * (1 + ecs * cos(Ms));
+  // me = ne * d + Le - we; //earth
+
+  //True anomaly for Moon 
+  xv = am * (cos(Em) - ecm);
+  yv = am * (sqrt(1 - ecm * ecm) * sin(Em));
+  console.log('xv, yv = ', xv, yv)
+  vm = FNrange(atan2(yv, xv));
+  // Finding the radius vector of the planet
+  rm = sqrt(xv * xv + yv * yv);
+  //console.log('vm, vm_deg rm = ', vm, vm * degs, rm);
+  //These were the the moons position on the plane of
+  //its orbit
+  //Now,  convert to eclipitic coordinates
+
+
+  //True anomaly for Sun 
+  xvs = as * (cos(Es) - ecs);
+  yvs = as * (sqrt(1 - ecs * ecs) * sin(Es));
+  vs = atan2(yvs, xvs);
+  // Finding the radius vector of the planet
+  rs = sqrt(xvs * xvs + yvs * yvs);
+  console.log('xvs,yvs,vs = ', xvs, yvs, vs);
+  //moon's true longitude
+  lonmoon = vm + wm;
+  // Sun's true longitude
+  lonsun = vs + ws;
+  console.log(' lonsun degs = ', lonsun*degs);
+
+  //horizontal cartesian geocentric coordinates
+  //
+  xeclip = rm * (cos(Nm) * cos(vm + wm) - sin(Nm) * sin(vm + wm) * cos(im));
+  yeclip = rm * (sin(Nm) * cos(vm + wm) + cos(Nm) * sin(vm + wm) * cos(im));
+  zeclip = rm * (sin(vm + wm) * sin(im));
+  console.log('xeclip, yeclip, zeclip: ', xeclip, yeclip, zeclip);
+  //   moons geocentric long and lat
+  lon = atan2(yeclip, xeclip); //
+  lat = atan2(zeclip, sqrt(xeclip * xeclip + yeclip * yeclip));
+  console.log('Moon lon, lat DEGS = ', lon * degs, lat * degs);
+  //perturbations - skipping them
+  //
+  //Moon's topocentric position
+
+  Ls = Ms + ws; //Mean Longitude of the Sun  (Ns=0)
+  Lm = Mm + wm + Nm; //Mean longitude of the Moon
+  dm = Lm - Ls; // 'Mean elongation of the Moon
+  F = Lm - Nm; //Argument of latitude for the Moon
+  console.log('Mean Longitude of the MOON : ', Lm);
+  //
+  //   distance terms earth radii
+  rm = rm - 0.58 * cos(Mm - 2 * dm);
+  rm = rm - 0.46 * cos(2 * dm);
+  //   next find the cartesian coordinates
+  //   of the geocentric lunar position
+  xg = rm * cos(lon) * cos(lat);
+  yg = rm * sin(lon) * cos(lat);
+  zg = rm * sin(lat);
+ 
+
+  //for the sun
+  xs = rs * cos(lonsun);
+  ys = rs * sin(lonsun);
+  console.log('xs, ys = ', xs, ys);
+  //   rotate to equatorial coords
+  //   obliquity of ecliptic of date
+  ecl = (23.4393 - 3.563E-07 * d) * rads;
+  console.log('ecl = ', ecl * degs);
+  xe = xg;
+  ye = yg * cos(ecl) - zg * sin(ecl);
+  ze = yg * sin(ecl) + zg * cos(ecl);  //   moons geocentric long and lat
+  lon = atan2(yeclip, xeclip); //
+  lat = atan2(zeclip, sqrt(xeclip * xeclip + yeclip * yeclip));
+  console.log('Moon lon, lat DEGS = ', lon * degs, lat * degs);
+  // 
+  // for sun
+  xes = xs;
+  yes = ys * cos(ecl);
+  zes = ys * sin(ecl);
+  console.log('xes, yes, zes = ', xes, yes, zes);
+  //   geocentric RA and Dec
+  ra = atan2(ye, xe);
+  dec = atan(ze / sqrt(xe * xe + ye * ye));
+  ras = atan2(yes, xes);
+  decs = atan(zes / sqrt(xes * xes + yes * yes));
+  console.log('SOL  ras, decs = ', ras, decs);
+
+
+  LsHour = Ls * degs / 15;
+  LmHour = Lm *degs/15;
+
+  while (LsHour > 24) {
+    LsHour -= 24;
+  }
+  while (LsHour < 0) {
+    LsHour += 24;
+  }
+  GMST0 = LsHour - 12;
+  GMST = GMST0 + UT;
+  console.log('GMST0 =');
+  console.log('GMST =', GMST );
+  console.log('LsHour = ', LsHour);
+  console.log('LmHour = ', LmHour)
+  
+  RA = ra * degs / 15;
+  Dec = dec * degs;
+  console.log(' Verificação : Dec = ', Dec);
+  RAs = ras * degs / 15;
+  if (RAs < 0) {
+    RAs += 24;
+  }
+
+  Decs = decs * degs;
+  lonloc = (RA - GMST) * 15;
+  lonlocs = (RAs - GMST) * 15;
+  console.log('464-RA, Dec (sun), UT =', RAs, Decs, UT);
+  console.log('464-RA, Dec (moon), UT =', RA, Dec, UT);
+  //
+  while (lonloc < -180) {
+    lonloc += 360;
+    //console.log(lonloc);
+  }
+  while (lonloc > 180) {
+    lonloc -= 360;
+    //console.log(lonloc);
+  }
+
+  //
+  while (lonlocs < -180) {
+    lonlocs += 360;
+    //console.log(lonloc);
+  }
+  while (lonlocs > 180) {
+    lonlocs -= 360;
+    //console.log(lonloc);
+  }
+
+  console.log('longitude of moon overhead = ', lonloc);
+  console.log('longitude of sun overhead = ', lonlocs);
+  //END//convert angles to first loop, degrees
+
+} //end function Moon
+//
+//
+function rev(angle) { //convert angles to first loop, degrees
+  while (angle > 360) {
+    angle -= 360;
+  }
+  while (angle < -360) {
+    angle += 360;
+  }
+  return angle;
+} ///end function rev    
+
+//
+//   Get the days to between a given date and today.  // the given date is the date of the orbital eleMents
+// 
+function numeroDeDias() {
+
+  let now = (new Date()).getTime();
+  let stampj2001 = (new Date('1999-12-31T00:00:00Z')).getTime();
+  //time for calculation date:
+  //
+  let epoca = (now - stampj2001) / 1000;
+  //console.log('epoca = ' + epoca);
+  let numdias = epoca / 86400;
+  console.log('numero de dias entre 2000-01-01 e agora = ' + numdias); //incluir frações do dia, depois: dayfrac = hours+ min/60)/24
+  //calculatin UT time, decimal hours
+  now = new Date();
+  minutes = now.getUTCMinutes() / 60;
+  seconds = now.getUTCSeconds() / 360;
+  hours = now.getUTCHours();
+  UT = hours + minutes + seconds;
+  console.log('522-UT', UT);
+  return numdias;
+} //end function numeroDeDias
+//****************************FNRANGE
+//   the function below returns an angle in the range
+//   0 to two pi
+//
+function FNrange(x) {
+  //console.log('x = ' + x);
+  b = x / twopi;
+  //console.log('int(b) =', int(b));
+  aa = x - twopi * int(b); // 
+  //console.log('x, aa, b, dentro de range = ', x, aa, b);
+  if (aa < 0) {
+    //console.log('aa less than zero');
+    //console.log('twopi + aa = ' + (twopi + aa));
+    return (twopi + aa);
+  } else {
+    return aa;
+  }
+} //end FNrange
