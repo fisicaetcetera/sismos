@@ -1,12 +1,8 @@
 //Working very well - going to improve the graph now.
 //Will create my 'map()' since the old one is not working
-// OK.  Now need to plot correctly sun and moon on the map.  3D not a good idea yet.
-//date 201223-ra and dec ok for sun moon.  Need to find lat long of overead sun, moon
 // Quakes every 24 hours mapped on flat earth.
 // Calculates and writes the moon declination
-// This version: including the moon en 3D, with texture.
-//mostly recent:working on sun's longitudinal motion, no declination, ok.
-//now including moons longitudinal motion...
+
 
 // USGS Earthquake API:
 //   https://earthquake.usgs.gov/fdsnws/event/1/#methods
@@ -187,7 +183,7 @@ function draw() {
   tempo();
   h3.html(dia + "/" + mes + "/" + ano + " " + hours + ":" + minutes + ":" + seconds);
   //  
-    rotateX(factor * 0.7);
+  rotateX(factor * 0.7);
   push();
   texture(terra);
   translate(0, 0);
@@ -209,7 +205,7 @@ function draw() {
   console.log('mean longitude of sun = ', Ls * degs);
   // console.log('numero de dias desde elementos = ' + d);
   //
-  Moon(); //get RA, Dec and range for Moon
+  Moon(); //get RA, Dec and range for Moon AND Sun
   // console.log('RA = ', ra * degs / 15);
   // console.log('DEC = ', dec * degs);
   console.log('lon, lat = ', lon * degs, lat * degs);
@@ -226,27 +222,67 @@ function draw() {
   translate(xMoon, ylua, 5);
   rotateY(angulo);
   texture(moon);
+  //fill(0,100,255,200);
   sphere(10);
   pop();
-
-  // sol
-  sunlat = Decs; //
-  sunlong = ((12 - UT) / 24 * 360);
-  //console.log('sunlong = ...', + sunlong);
-  if (sunlong < -180) {
-    sunlong += 360;
+  //== do outro lado - recente
+  push();
+  console.log('before', xMoon, ylua);
+  if (xMoon > 0) {
+    xMoon = xMoon - width / 2;
+  } else {
+    xMoon = width / 2 + xMoon;
   }
+  ylua = -ylua;
+  console.log('after', xMoon, ylua);
+  console.log(height / 2, width / 2);
+  translate(xMoon, ylua, 5);
+  rotateY(6*angulo);
+  texture(moon);
+  sphere(5);
+  strokeWeight(3);
+  pop();
+
   let xSol = map(lonlocs, -180, +180, -width / 2, width / 2);
 
   let ySol = map(Decs, 90, -90, -height / 2, height / 2);
 
   push()
   translate(xSol, ySol, 5);
-  rotateY(angulo);
+  rotateY(6*angulo);
   texture(sol);
   sphere(10);
 
   pop();
+  
+  //sol virtual===
+  
+    //== do outro lado - recente
+  push();
+  console.log('before', xSol, ySol);
+  if (xSol > 0) {
+    xSol = xSol - width / 2;
+  } else {
+    xSol = width / 2 + xSol;
+  }
+  ySol = -ySol;
+  console.log('after', xSol, ySol);
+  console.log(height / 2, width / 2);
+  translate(xSol, ySol, 5);
+
+  rotateY(6*angulo);
+  texture(sol);
+  //fill(55, 255, 5, 150);
+  sphere(5);
+  pop();
+  noFill();
+  stroke(111);
+//beginShape();
+//vertex(0, 35);
+//vertex(35, 0);
+//  vertex(0,0);
+//endShape(CLOSE);
+  ///===
 
   for (var j = total; j > -1; j--) {
     let yylat = map(latsys[j], 90, -90, -height / 2, height / 2, true);
@@ -319,8 +355,8 @@ function Moon() {
   ws = FNrange((282.9404 + 4.70935e-5 * d) * rads);
   am = 60.2666 //semi-major axis (Earth radii)
   as = 1; //(AU)
-  ecm = 0.0549*rads;
-  ecs = (0.016709 - 1.151E-9 * d) *rads; //
+  ecm = 0.0549 * rads;
+  ecs = (0.016709 - 1.151E-9 * d) * rads; //
   Mm = FNrange((115.3654 + 13.0649929509 * d) * rads); // mean anomaly
   Ms = FNrange((356.0470 + 0.9856002585 * d) * rads);
   Em = Mm + ecm * sin(Mm) * (1 + ecm * cos(Mm)); //eccentric anomaly
@@ -352,7 +388,7 @@ function Moon() {
   lonmoon = vm + wm;
   // Sun's true longitude
   lonsun = vs + ws;
-  console.log(' lonsun degs = ', lonsun*degs);
+  console.log(' lonsun degs = ', lonsun * degs);
 
   //horizontal cartesian geocentric coordinates
   //
@@ -382,7 +418,7 @@ function Moon() {
   xg = rm * cos(lon) * cos(lat);
   yg = rm * sin(lon) * cos(lat);
   zg = rm * sin(lat);
- 
+
 
   //for the sun
   xs = rs * cos(lonsun);
@@ -394,7 +430,7 @@ function Moon() {
   console.log('ecl = ', ecl * degs);
   xe = xg;
   ye = yg * cos(ecl) - zg * sin(ecl);
-  ze = yg * sin(ecl) + zg * cos(ecl);  //   moons geocentric long and lat
+  ze = yg * sin(ecl) + zg * cos(ecl); //   moons geocentric long and lat
   lon = atan2(yeclip, xeclip); //
   lat = atan2(zeclip, sqrt(xeclip * xeclip + yeclip * yeclip));
   console.log('Moon lon, lat DEGS = ', lon * degs, lat * degs);
@@ -413,7 +449,7 @@ function Moon() {
 
 
   LsHour = Ls * degs / 15;
-  LmHour = Lm *degs/15;
+  LmHour = Lm * degs / 15;
 
   while (LsHour > 24) {
     LsHour -= 24;
@@ -424,10 +460,10 @@ function Moon() {
   GMST0 = LsHour - 12;
   GMST = GMST0 + UT;
   console.log('GMST0 =');
-  console.log('GMST =', GMST );
+  console.log('GMST =', GMST);
   console.log('LsHour = ', LsHour);
   console.log('LmHour = ', LmHour)
-  
+
   RA = ra * degs / 15;
   Dec = dec * degs;
   console.log(' Verificação : Dec = ', Dec);
