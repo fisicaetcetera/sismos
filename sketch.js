@@ -276,7 +276,7 @@ function draw() {
   sphere(5);
   pop();
   noFill();
-  stroke(111);
+  //stroke(111);
 //beginShape();
 //vertex(0, 35);
 //vertex(35, 0);
