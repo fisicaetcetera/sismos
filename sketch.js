@@ -2,7 +2,7 @@
 //Will create my 'map()' since the old one is not working
 // Quakes every 24 hours mapped on flat earth.
 // Calculates and writes the moon declination
-
+// This version: including the moon en 3D, with texture.
 
 // USGS Earthquake API:
 //   https://earthquake.usgs.gov/fdsnws/event/1/#methods
@@ -21,6 +21,7 @@ var Name = [];
 var h5;
 var h6;
 var h3;
+var h11;
 let degtorad = 57.296;
 let currentTime;
 let dia, hours, minutes, seconds, mes, ano;
@@ -89,6 +90,7 @@ let ecs; // ecentricidade, calculada abaixo
 let Ms;
 let RAs, Decs, RA, Dec; //sun, moon
 let Ls; //mean longitude of the sun
+    let OntemHoje;
 
 //======
 
@@ -125,7 +127,8 @@ function setup() {
   //assinatura.textSize(75);
   //assinatura.text('4.5', 0, 0);
 
-  h4 = createElement('h5', 'Declinacao estimada da Lua : ' + 1);
+  h4 = createElement('h5', 'Declinacao da Lua : ' + 1);
+  h11 = createElement('h5', 'Declinacao do Sol : ' + 1);
 
   tempo(); //obtem a data e hora
   h3 = createElement('h5', (dia + "/" + mes + "/" + ano + " " + hours + ":" + minutes + ":" + seconds));
@@ -157,7 +160,6 @@ function setup() {
     var sismoTempo = new Date(time);
     var sismoHora = sismoTempo.getHours();
     var sismoMin = sismoTempo.getMinutes();
-    var OntemHoje;
     if (sismoHora > hours) {
       OntemHoje = "Ontem";
     } else {
@@ -169,6 +171,7 @@ function setup() {
       createP('Magnitude ' + Mag[i]);
       createP('Quando: ' + sismoHora + ":" + sismoMin + "   " + OntemHoje);
       createP('::::::::::::::Sismo ' + n + '/' + i + '/' + total);
+        console.log('ontemhoje = ', OntemHoje);
     }
   }
 }
@@ -189,9 +192,6 @@ function draw() {
   translate(0, 0);
   plane(640, 300);
   pop();
-  //console.log(width, height);
-  //desenha a lua
-  //declination = declinacao();
 
   let ylua = map(declination, 90, -90, -height / 2, height / 2);
   console.log('declination, ylua = ', declination, ylua);
@@ -221,8 +221,8 @@ function draw() {
   push();
   translate(xMoon, ylua, 5);
   rotateY(angulo);
-  texture(moon);
-  //fill(0,100,255,200);
+  //texture(moon);
+  fill('blue');
   sphere(10);
   pop();
   //== do outro lado - recente
@@ -238,9 +238,10 @@ function draw() {
   console.log(height / 2, width / 2);
   translate(xMoon, ylua, 5);
   rotateY(6*angulo);
-  texture(moon);
+  //texture(moon);
+    fill('blue');
   sphere(5);
-  strokeWeight(3);
+
   pop();
 
   let xSol = map(lonlocs, -180, +180, -width / 2, width / 2);
@@ -250,7 +251,8 @@ function draw() {
   push()
   translate(xSol, ySol, 5);
   rotateY(6*angulo);
-  texture(sol);
+  //texture(sol);
+ fill('yellow');
   sphere(10);
 
   pop();
@@ -270,42 +272,38 @@ function draw() {
   console.log(height / 2, width / 2);
   translate(xSol, ySol, 5);
 
-  rotateY(6*angulo);
-  texture(sol);
-  //fill(55, 255, 5, 150);
+  //rotateY(6*angulo);
+  //texture(sol);
+  fill('yellow');
   sphere(5);
   pop();
-  noFill();
-  //stroke(111);
-//beginShape();
-//vertex(0, 35);
-//vertex(35, 0);
-//  vertex(0,0);
-//endShape(CLOSE);
   ///===
-
+if(OntemHoje == "Hoje"){
+console.log('dentro do loop, ontemhoje = ', OntemHoje);
   for (var j = total; j > -1; j--) {
     let yylat = map(latsys[j], 90, -90, -height / 2, height / 2, true);
     let xlong = map(long[j], -180, 180, -width / 2, width / 2, true);
     push();
     translate(xlong, yylat);
     rotateX(1.5);
-    if (Mag[j] > 5) {
+    if (Mag[j] > 4) {
       fill(255, 0, 0, 225);
     } else {
-      fill(125, 255, 150, 50)
+      fill(0, 255, 150, 150)
     }
     cylinder(nn * Mag[j], 5);
     pop();
-  }
+  } //for
+  } //if ontemhoje
   if (nn > 2) {
     nn--;
   } else {
     nn++;
   }
-  //h4.html('Declinacao estimada da Lua : ' + Dec);
-  h4.html('Declinacao estimada do Sol: ' + Decs);
-}
+  h4.html('Declinacao da Lua : ' + Dec);
+  h11.html('Declinacao do Sol: ' + Decs);
+} //draw
+console.log('OntemHoje = ' + OntemHoje);
 
 function tempo() {
   currentTime = new Date();
