@@ -60,7 +60,7 @@ let ee = 0.016709; // same as e, for earth
 //let a = 1.523762; //semi-major axis
 let ae = 1.000; //same as a, for earth
 //let o = 49.5574; //longitude of ascending node, degrees
-let radiusMoon = 10;
+let radiusMoon = 6;
 
 let oe = 0.0; //same as o, for earth
 let i = 1.8496; // inclination of plane of orbit, degrees
