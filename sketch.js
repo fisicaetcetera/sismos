@@ -60,6 +60,7 @@ let ee = 0.016709; // same as e, for earth
 //let a = 1.523762; //semi-major axis
 let ae = 1.000; //same as a, for earth
 //let o = 49.5574; //longitude of ascending node, degrees
+let radiusMoon = 10;
 
 let oe = 0.0; //same as o, for earth
 let i = 1.8496; // inclination of plane of orbit, degrees
@@ -222,7 +223,7 @@ function draw() {
   rotateY(angulo);
   //texture(moon);
   fill('blue');
-  sphere(10);
+  sphere(radiusMoon);
   pop();
   //== do outro lado - recente
   push();
@@ -239,7 +240,7 @@ function draw() {
   rotateY(6*angulo);
   //texture(moon);
     fill('blue');
-  sphere(5);
+  sphere(radiusMoon/2);
 
   pop();
 
@@ -252,7 +253,7 @@ function draw() {
   rotateY(6*angulo);
   //texture(sol);
  fill('yellow');
-  sphere(10);
+  sphere(radiusMoon);
 
   pop();
   
@@ -274,7 +275,7 @@ function draw() {
   //rotateY(6*angulo);
   //texture(sol);
   fill('yellow');
-  sphere(5);
+  sphere(radiusMoon/2);
   pop();
   ///===
 if(OntemHoje == "Hoje"){
