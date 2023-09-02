@@ -329,13 +329,8 @@ function tempo() {
 }
 
 function mousePressed() {
-  //console.log(factor of rotation);
-  if (factor == 0) {
-    factor = 2;
-  } else {
-    factor = 0;
-  }
-  //console.log(factor);
+  width = width/2;
+  height = height/2;
   return false;
 }
 
