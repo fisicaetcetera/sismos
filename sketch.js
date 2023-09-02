@@ -329,8 +329,8 @@ function tempo() {
 }
 
 function mousePressed() {
-  width = width/2;
-  height = height/2;
+  width = width/1.2;
+  height = height/1.2;
   return false;
 }
 
