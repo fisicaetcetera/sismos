@@ -119,7 +119,7 @@ function setup() {
   //noLoop();
   //saveJSON(quakes, 'all_day.geo.json', false);
   //
-  createCanvas(640,300, WEBGL);
+  createCanvas(1280,600, WEBGL);
   //
   //assinatura = createGraphics(10, 10);
   //assinatura.background(255, 55);
@@ -190,7 +190,7 @@ function draw() {
   push();
   texture(terra);
   translate(0, 0);
-  plane(640, 300);
+  plane(width, height);
   pop();
 
   let ylua = map(declination, 90, -90, -height / 2, height / 2);
@@ -215,7 +215,7 @@ function draw() {
   console.log('moonlong = ', moonlong);
   console.log('Lua longitude = ', moonlong)
   //let xMoon = map(moonLong, -180, 180, -width / 2, width / 2, true);
-  let xMoon = (moonlong + 180) * 640 / 360 - width / 2;
+  let xMoon = (moonlong + 180) * width / 360 - width / 2;
   // console.log('width = ', width);
   // console.log('xMoon = ', xMoon);
   push();
