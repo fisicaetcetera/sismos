@@ -119,7 +119,8 @@ function setup() {
   //noLoop();
   //saveJSON(quakes, 'all_day.geo.json', false);
   //
-  createCanvas(1280,600, WEBGL);
+  //createCanvas(1280,600, WEBGL);
+    createCanvas(width,height, WEBGL);
   //
   //assinatura = createGraphics(10, 10);
   //assinatura.background(255, 55);
