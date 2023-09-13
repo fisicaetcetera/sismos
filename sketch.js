@@ -8,6 +8,8 @@
 //   https://earthquake.usgs.gov/fdsnws/event/1/#methods
 let angle = 0;
 let angulo;
+let width = 1280;
+let height = 600;
 var total;
 var quakes;
 let n = 0; //numero de terremotos com magnitude escolhida
@@ -18,6 +20,7 @@ var long = [];
 var hora = [];
 var Mag = [];
 var Name = [];
+// formatação 
 var h5;
 var h6;
 var h3;
@@ -119,7 +122,7 @@ function setup() {
   //noLoop();
   //saveJSON(quakes, 'all_day.geo.json', false);
   //
-  createCanvas(1280,600, WEBGL);
+  createCanvas(width,height, WEBGL);
   //
   //assinatura = createGraphics(10, 10);
   //assinatura.background(255, 55);
