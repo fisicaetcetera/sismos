@@ -103,6 +103,7 @@ function preload() {
   terra = loadImage('earthmap1k.jpg');
   moon = loadImage('moonmap1k.jpg');
   sol = loadImage('sun.jpg');
+  myFont = loadFont('cattalina.otf');
   //let url = 'all_day.geo.json';
   let url = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson';
   quakes = loadJSON(url);
@@ -291,6 +292,7 @@ console.log('dentro do loop, ontemhoje = ', OntemHoje);
     let xlong = map(long[j], -180, 180, -width / 2, width / 2, true);
     push();
     translate(xlong, yylat);
+      textFont(myFont);
           fill(255,0,0,51);
     text('word', xlong+10,yylat+10);
 
