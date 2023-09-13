@@ -137,7 +137,7 @@ function setup() {
   tempo(); //obtem a data e hora
   h3 = createElement('h5', (dia + "/" + mes + "/" + ano + " " + hours + ":" + minutes + ":" + seconds));
   createP('Discos em vermelho representam sismos de magnitude acima de 4.  Abaixo,  lista de sismos acima de magnitude 3.')
-  h5 = createElement('h5', 'Lista de Terremotos com magnitude acima de 3, nas últimas  24 horas.');
+  createElement('h5', 'Lista de Terremotos com magnitude acima de 3, nas últimas  24 horas.');
   createElement('h5', 'autor: Enivaldo Bonelli, enivaldob@yahoo.com ');
 
   var features = quakes.features;
