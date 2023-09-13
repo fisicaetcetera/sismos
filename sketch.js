@@ -140,7 +140,10 @@ function setup() {
   var features = quakes.features;
   var geometry = quakes.geometry;
   total = features.length;
-
+  // Apresentação
+    let h5 = createElement('h5', 'Sismos das útimas 24 horas, maiores que 4 graus na escala Richter.');
+    h5.style('color', '#00a1d3');
+    h5.position(0, 0);
   //Agradecimentos
   createElement('center', 'Agradecimentos a');
   createElement('center', 'Daniel Shiffman,');
