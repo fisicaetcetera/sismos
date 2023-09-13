@@ -293,8 +293,9 @@ console.log('dentro do loop, ontemhoje = ', OntemHoje);
     push();
     translate(xlong, yylat);
       textFont(myFont);
-          fill(255,0,0,51);
-    text('word', xlong+10,yylat+10);
+          //fill(255,0,0,51);
+      textSize(11);
+    text('word', xlong+10, yylat,100,50);
 
     //rotateX(1.5);
     if (Mag[j] > 4) {
