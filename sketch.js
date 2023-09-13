@@ -291,15 +291,16 @@ console.log('dentro do loop, ontemhoje = ', OntemHoje);
     let yylat = map(latsys[j], 90, -90, -height / 2, height / 2, true);
     let xlong = map(long[j], -180, 180, -width / 2, width / 2, true);
     push();
-    translate(xlong, yylat);
+    
+
+    rotateX(1.5);
+    if (Mag[j] > 4) {
+      fill(255, 0, 0, 225);
+        translate(xlong, yylat);
       textFont(myFont);
           //fill(255,0,0,51);
       textSize(11);
     text('word', xlong+10, yylat,100,50);
-
-    //rotateX(1.5);
-    if (Mag[j] > 4) {
-      fill(255, 0, 0, 225);
     } else {
       fill(0, 255, 0, 150)
     }
