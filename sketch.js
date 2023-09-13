@@ -300,7 +300,7 @@ console.log('dentro do loop, ontemhoje = ', OntemHoje);
       textFont(myFont);
           //fill(255,0,0,51);
       textSize(11);
-    text('word', xlong+10, yylat,100,50);
+    text('Estou consertando - vai melhorar...', xlong, yylat,100,50);
     } else {
       fill(0, 255, 0, 150)
     }
