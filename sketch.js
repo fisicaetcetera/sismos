@@ -143,10 +143,10 @@ function setup() {
   var features = quakes.features;
   var geometry = quakes.geometry;
   total = features.length;
-  // Apresentação
-    let h5 = createElement('h5', 'Sismos das útimas 24 horas, maiores que 4 graus na escala Richter.');
-    h5.style('color', '#00a1d3');
-    h5.position(0, 0);
+  // Apresentação, cabeçalho
+    let topo = createElement('h5', 'Sismos das útimas 24 horas, maiores que 4 graus na escala Richter.');
+    topo.style('color', 'white');
+    topo.position(10, 10);
   //Agradecimentos
   createElement('center', 'Agradecimentos a');
   createElement('center', 'Daniel Shiffman,');
@@ -291,11 +291,13 @@ console.log('dentro do loop, ontemhoje = ', OntemHoje);
     let xlong = map(long[j], -180, 180, -width / 2, width / 2, true);
     push();
     translate(xlong, yylat);
+    text('word', xlong+10,ylat+10);
+    fill(255,0,0,51);
     rotateX(1.5);
     if (Mag[j] > 4) {
       fill(255, 0, 0, 225);
     } else {
-      fill(0, 255, 150, 150)
+      fill(0, 255, 0, 150)
     }
     cylinder(nn * Mag[j], 5);
     pop();
