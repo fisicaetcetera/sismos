@@ -293,7 +293,7 @@ console.log('dentro do loop, ontemhoje = ', OntemHoje);
     push();
     
 
-    rotateX(1.5);
+   
     if (Mag[j] > 4) {
       fill(255, 0, 0, 225);
         translate(xlong, yylat);
@@ -304,6 +304,7 @@ console.log('dentro do loop, ontemhoje = ', OntemHoje);
     } else {
       fill(0, 255, 0, 150)
     }
+    rotateX(1.5);
     cylinder(nn * Mag[j], 5);
     pop();
   } //for
