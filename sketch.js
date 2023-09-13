@@ -291,7 +291,7 @@ console.log('dentro do loop, ontemhoje = ', OntemHoje);
     let xlong = map(long[j], -180, 180, -width / 2, width / 2, true);
     push();
     translate(xlong, yylat);
-    text('word', xlong+10,ylat+10);
+    text('word', xlong+10,yylat+10);
     fill(255,0,0,51);
     rotateX(1.5);
     if (Mag[j] > 4) {
