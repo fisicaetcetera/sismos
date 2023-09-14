@@ -137,17 +137,17 @@ function setup() {
 
   tempo(); //obtem a data e hora
   h3 = createElement('h5', (dia + "/" + mes + "/" + ano + " " + hours + ":" + minutes + ":" + seconds));
-  createP('Discos em vermelho representam sismos de magnitude acima de 4.  Abaixo,  lista de sismos acima de magnitude 3.')
-  createElement('h5', 'Lista de Terremotos com magnitude acima de 3, nas últimas  24 horas.');
-  createElement('h5', 'autor: Enivaldo Bonelli, enivaldob@yahoo.com ');
+  createP('Discos em vermelho representam sismos de magnitude acima de 3.5.  Abaixo,  lista de sismos acima de magnitude 3.0')
+  //createElement('h5', 'Lista de Terremotos com magnitude acima de 3.5, nas últimas  24 horas.');
+  createElement('h3', 'autor: Enivaldo Bonelli, enivaldob@yahoo.com ');
 
   var features = quakes.features;
   var geometry = quakes.geometry;
   total = features.length;
   // Apresentação, cabeçalho
-    let topo = createElement('h5', 'Sismos das útimas 24 horas, maiores que 4 graus na escala Richter.');
-    topo.style('color', 'white');
-    topo.position(10, 10);
+    let topo = createElement('h3', 'Sismos das útimas 24 horas, maiores que 3.5 graus na escala Richter.');
+    topo.style('color', 'blue');
+    topo.position(10, 550);
   //Agradecimentos
   createElement('center', 'Agradecimentos a');
   createElement('center', 'Daniel Shiffman,');
@@ -290,22 +290,24 @@ console.log('dentro do loop, ontemhoje = ', OntemHoje);
   for (var j = total; j > -1; j--) {
     let yylat = map(latsys[j], 90, -90, -height / 2, height / 2, true);
     let xlong = map(long[j], -180, 180, -width / 2, width / 2, true);
-    push();
     
-
-   
-    if (Mag[j] > 4) {
+    push();  
+    if (Mag[j] > 3) {
       fill(255, 0, 0, 225);
-        translate(xlong, yylat);
-      textFont(myFont);
-          //fill(255,0,0,51);
-      textSize(11);
-    text('Estou consertando - vai melhorar...', xlong, yylat,100,50);
+      translate(xlong, yylat);
     } else {
       fill(0, 255, 0, 150)
     }
     rotateX(1.5);
     cylinder(nn * Mag[j], 5);
+    pop();
+    push();
+      if(Mag[j] > 3.5){
+        fill(0,0,0);
+        textFont(myFont);
+        textSize(13);
+        text(Mag[j], xlong-9, yylat-5,100,50);
+      }
     pop();
   } //for
   } //if ontemhoje
