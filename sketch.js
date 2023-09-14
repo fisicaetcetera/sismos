@@ -343,13 +343,6 @@ function tempo() {
     hours = 12;
   }
 }
-
-function mousePressed() {
-  width = width/1.2;
-  height = height/1.2;
-  return false;
-}
-
 //
 
 //************** FUNCTIONS ****************
