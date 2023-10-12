@@ -32,6 +32,7 @@ let TZ;
 let factor = 0;
 let radius;
 let declination;
+let userLat, userLong;
 //===== do moontrack
 
 
@@ -100,7 +101,7 @@ let Ls; //mean longitude of the sun
 
 function preload() {
 
-  terra = loadImage('earthmap1k.jpg');
+  terra = loadImage('earthMap.jpg');
   moon = loadImage('moonmap1k.jpg');
   sol = loadImage('sun.jpg');
   myFont = loadFont('Catallina.otf');
@@ -110,7 +111,18 @@ function preload() {
 }
 
 function setup() {
-  //do outro programa  ==========
+  //localização do usuário
+  fetch('https://api.geoapify.com/v1/ipinfo?apiKey=df56ea8b09b64183882faaf437ac2620')
+  .then(response => response.json())
+  .then(data => {
+  // You can now access the location data in the "data" object
+    console.log(data);
+    console.log("Aqui.");
+    userLat = data.location.latitude;
+    userLong = data.location.longitude;
+    createP('Sua localização, Lat: ' + userLat + ' Lon: ' + userLong);
+  })
+  //
 
   twopi = TWO_PI;
   degs = 180 / PI;
@@ -254,14 +266,24 @@ function draw() {
   let xSol = map(lonlocs, -180, +180, -width / 2, width / 2);
 
   let ySol = map(Decs, 90, -90, -height / 2, height / 2);
+  
+  let userX = map(userLong, -180, +180, -width / 2, width / 2);
 
+  let userY = map(userLat, 90, -90, -height / 2, height / 2);
+  createP(userX);
+  createP(userY);
   push()
-  translate(xSol, ySol, 5);
-  rotateY(6*angulo);
+  translate(xSol, ySol, 15);
+  //rotateY(6*angulo);
   //texture(sol);
  fill('yellow');
-  sphere(radiusMoon);
-
+ sphere(radiusMoon);
+ pop();
+ //
+ push();
+ translate(userX, userY,5);
+ fill(255,255,255,30);
+ sphere(10);
   pop();
   
   //sol virtual===
@@ -343,6 +365,13 @@ function tempo() {
     hours = 12;
   }
 }
+
+function mousePressed() {
+  width = width/1.2;
+  height = height/1.2;
+  return false;
+}
+
 //
 
 //************** FUNCTIONS ****************
