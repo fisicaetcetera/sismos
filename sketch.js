@@ -101,7 +101,7 @@ let Ls; //mean longitude of the sun
 
 function preload() {
 
-  terra = loadImage('earthmap1k.jpg');
+  terra = loadImage('earthMap.jpg');
   moon = loadImage('moonmap1k.jpg');
   sol = loadImage('sun.jpg');
   myFont = loadFont('Catallina.otf');
@@ -273,7 +273,7 @@ function draw() {
   createP(userX);
   createP(userY);
   push()
-  translate(xSol, ySol, 15);
+  translate(xSol, ySol, 35);
   //rotateY(6*angulo);
   //texture(sol);
  fill('yellow');
