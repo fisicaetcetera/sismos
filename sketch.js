@@ -101,7 +101,7 @@ let Ls; //mean longitude of the sun
 
 function preload() {
 
-  terra = loadImage('earthmap1k.jpg');
+  terra = loadImage('earthMap.jpg');
   moon = loadImage('moonmap1k.jpg');
   sol = loadImage('sun.jpg');
   myFont = loadFont('Catallina.otf');
@@ -270,8 +270,8 @@ function draw() {
   let userX = map(userLong, -180, +180, -width / 2, width / 2);
 
   let userY = map(userLat, 90, -90, -height / 2, height / 2);
-  createP(userX);
-  createP(userY);
+  //createP(userX);
+  //createP(userY);
   push()
   translate(xSol, ySol, 35);
   //rotateY(6*angulo);
@@ -365,13 +365,6 @@ function tempo() {
     hours = 12;
   }
 }
-
-function mousePressed() {
-  width = width/1.2;
-  height = height/1.2;
-  return false;
-}
-
 //
 
 //************** FUNCTIONS ****************
