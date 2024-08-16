@@ -2,7 +2,7 @@
 //Will create my 'map()' since the old one is not working
 // Quakes every 24 hours mapped on flat earth.
 // Calculates and writes the moon declination
-// This version: including the moon en 3D, with texture.
+// 
 
 // USGS Earthquake API:
 //   https://earthquake.usgs.gov/fdsnws/event/1/#methods
