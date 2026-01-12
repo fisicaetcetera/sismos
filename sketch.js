@@ -1,9 +1,5 @@
-//Working very well - going to improve the graph now.
-//Will create my 'map()' since the old one is not working
 // Quakes every 24 hours mapped on flat earth.
 // Calculates and writes the moon declination
-// 
-
 // USGS Earthquake API:
 //   https://earthquake.usgs.gov/fdsnws/event/1/#methods
 let angle = 0;
@@ -437,6 +433,8 @@ function Moon() {
   //   distance terms earth radii
   rm = rm - 0.58 * cos(Mm - 2 * dm);
   rm = rm - 0.46 * cos(2 * dm);
+  rmkm = rm * 6378;
+    console.log('distância da Lua = ', rmkm);
   //   next find the cartesian coordinates
   //   of the geocentric lunar position
   xg = rm * cos(lon) * cos(lat);
