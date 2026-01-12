@@ -141,8 +141,8 @@ function setup() {
   //assinatura.textSize(75);
   //assinatura.text('4.5', 0, 0);
 
-  h4 = createElement('h5', 'Declinacao da Lua : ' + 1);
-  h11 = createElement('h5', 'Declinacao do Sol : ' + 1);
+  h4 = createElement('h5', 'Declinação da Lua : ' + 1);
+  h11 = createElement('h5', 'Declinação do Sol : ' + 1);
   h5 = createElement('h5', 'Distância da Lua : ' + 1);
 
   tempo(); //obtem a data e hora
@@ -338,7 +338,7 @@ console.log('dentro do loop, ontemhoje = ', OntemHoje);
   }
   h4.html('Declinacao da Lua : ' + Dec);
   h11.html('Declinacao do Sol: ' + Decs);
-  h2.html('Distância da Lua : ' + rmkm);
+  h5.html('Distância da Lua : ' + rmkm);
   
 } //draw
 console.log('OntemHoje = ' + OntemHoje);
