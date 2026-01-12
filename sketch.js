@@ -42,6 +42,7 @@ let twopi;
 let degs;
 let rads;
 // LUA
+let rmkm;
 let am = 60.2666; //(Earth radii)  == OK 
 let ecm = 0.0549; // == OK, excentricidade
 let im = 5.1454; //== OK
@@ -142,6 +143,7 @@ function setup() {
 
   h4 = createElement('h5', 'Declinacao da Lua : ' + 1);
   h11 = createElement('h5', 'Declinacao do Sol : ' + 1);
+  h5 = createElement('h5', 'Distância da Lua : ' + 1);
 
   tempo(); //obtem a data e hora
   h3 = createElement('h5', (dia + "/" + mes + "/" + ano + " " + hours + ":" + minutes + ":" + seconds));
@@ -336,6 +338,8 @@ console.log('dentro do loop, ontemhoje = ', OntemHoje);
   }
   h4.html('Declinacao da Lua : ' + Dec);
   h11.html('Declinacao do Sol: ' + Decs);
+  h2.html('Distância da Lua : ' + rmkm);
+  
 } //draw
 console.log('OntemHoje = ' + OntemHoje);
 
