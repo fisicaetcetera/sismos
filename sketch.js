@@ -435,8 +435,8 @@ function Moon() {
   console.log('Mean Longitude of the MOON : ', Lm);
   //
   //   distance terms earth radii
-  rm = rm - 0.58 * cos(Mm - 2 * dm);
-  rm = rm - 0.46 * cos(2 * dm);
+  rm = rm - 0.58 * cos(Mm - 2 * d);
+  rm = rm - 0.46 * cos(2 * d);
   rmkm = rm * 6378;
     console.log('distância da Lua = ', rmkm);
   //   next find the cartesian coordinates
