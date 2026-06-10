@@ -1,5 +1,9 @@
+//Working very well - going to improve the graph now.
+//Will create my 'map()' since the old one is not working
 // Quakes every 24 hours mapped on flat earth.
 // Calculates and writes the moon declination
+// This version: including the moon en 3D, with texture.
+
 // USGS Earthquake API:
 //   https://earthquake.usgs.gov/fdsnws/event/1/#methods
 let angle = 0;
@@ -30,8 +34,6 @@ let radius;
 let declination;
 let userLat, userLong;
 //===== do moontrack
-
-
 let lon;
 let dlon;
 let lonloc;
@@ -42,7 +44,6 @@ let twopi;
 let degs;
 let rads;
 // LUA
-let rmkm;
 let am = 60.2666; //(Earth radii)  == OK 
 let ecm = 0.0549; // == OK, excentricidade
 let im = 5.1454; //== OK
@@ -92,7 +93,7 @@ let ecs; // ecentricidade, calculada abaixo
 let Ms;
 let RAs, Decs, RA, Dec; //sun, moon
 let Ls; //mean longitude of the sun
-    let OntemHoje;
+let OntemHoje;
 
 //======
 
@@ -114,10 +115,11 @@ function setup() {
   .then(data => {
   // You can now access the location data in the "data" object
     console.log(data);
-    console.log("Aqui.");
+    console.log("aqui.");
     userLat = data.location.latitude;
     userLong = data.location.longitude;
     createP('Sua localização, Lat: ' + userLat + ' Lon: ' + userLong);
+    console.log("seu local é: ",userLat, userLong);
   })
   //
 
@@ -133,22 +135,13 @@ function setup() {
   //saveJSON(quakes, 'all_day.geo.json', false);
   //
   createCanvas(width,height, WEBGL);
-  //
-  //assinatura = createGraphics(10, 10);
-  //assinatura.background(255, 55);
-  //assinatura.fill(0);
-  //assinatura.textAlign(CENTER);
-  //assinatura.textSize(75);
-  //assinatura.text('4.5', 0, 0);
-
-  h4 = createElement('h5', 'Declinação da Lua : ' + 1);
-  h11 = createElement('h5', 'Declinação do Sol : ' + 1);
-  h5 = createElement('h5', 'Distância da Lua : ' + 1);
-
+  h4 = createElement('h5', 'Declinacao da Lua : ' + 1);
+  h11 = createElement('h5', 'Declinacao do Sol : ' + 1);
+  h7 = createElement('h5', 'Distância Lua-Terra : ' + 1);
   tempo(); //obtem a data e hora
   h3 = createElement('h5', (dia + "/" + mes + "/" + ano + " " + hours + ":" + minutes + ":" + seconds));
   createP('Discos em vermelho representam sismos de magnitude acima de 3.5.  Abaixo,  lista de sismos acima de magnitude 3.0')
-  //createElement('h5', 'Lista de Terremotos com magnitude acima de 3.5, nas últimas  24 horas.');
+
   createElement('h3', 'autor: Enivaldo Bonelli, enivaldob@yahoo.com ');
 
   var features = quakes.features;
@@ -194,6 +187,7 @@ function setup() {
 }
 ///////////////////////  draw()
 function draw() {
+  console.log("you are here:  ", userLat, userLong);
   declination = Dec;
   background(0);
   //directionalLight(255,255,0,0, 0, -1)
@@ -280,8 +274,12 @@ function draw() {
  //
  push();
  translate(userX, userY,5);
- fill(255,255,255,30);
+ //fill(255,255,255,30);
+ fill('white');
  sphere(10);
+   textFont(myFont);
+   textSize(13);
+   text("Você!", 10, 10);
   pop();
   
   //sol virtual===
@@ -338,11 +336,11 @@ console.log('dentro do loop, ontemhoje = ', OntemHoje);
   }
   h4.html('Declinacao da Lua : ' + Dec);
   h11.html('Declinacao do Sol: ' + Decs);
-  h5.html('Distância da Lua : ' + rmkm);
-  
+  h7.html('Distância Lua-Terra (km): ' + rm * 6371);
 } //draw
 console.log('OntemHoje = ' + OntemHoje);
-
+//
+//************** FUNCTIONS ****************
 function tempo() {
   currentTime = new Date();
   dia = currentTime.getDate();
@@ -365,29 +363,25 @@ function tempo() {
     hours = 12;
   }
 }
-//
-
-//************** FUNCTIONS ****************
-
-//
 //======function Moon =======
 function Moon() {
-
-  Nm = FNrange((125.1228 - 0.0529538083 * d) * rads); //Long ascending node
-  im = 5.1454 * rads; // inclination of orbit 
+//moonsun
+  Nm = FNrange((125.08 - 0.0529538083 * d) * rads); //Long ascending node
+  im = 5.16 * rads; // inclination of orbit 
   wm = FNrange((318.0634 + 0.1643573223 * d) * rads); //argm of periapsis
   ws = FNrange((282.9404 + 4.70935e-5 * d) * rads);
   am = 60.2666 //semi-major axis (Earth radii)
   as = 1; //(AU)
-  ecm = 0.0549 * rads;
-  ecs = (0.016709 - 1.151E-9 * d) * rads; //
-  Mm = FNrange((115.3654 + 13.0649929509 * d) * rads); // mean anomaly
+  ecm = 0.0549;
+  ecs = (0.016709 - 1.151E-9 * d); //
+  //Mm = FNrange((343 + 13.0649929509 * d) * rads); // mean anomaly
+  Mm = FNrange((135.27 + 13.0649929509 * d) * rads); // mean anomaly
+  console.log('Mm = ', Mm);
   Ms = FNrange((356.0470 + 0.9856002585 * d) * rads);
   Em = Mm + ecm * sin(Mm) * (1 + ecm * cos(Mm)); //eccentric anomaly
   //console.log('Em = ', Em, Em * degs)
   Es = Ms + ecs * sin(Ms) * (1 + ecs * cos(Ms));
   // me = ne * d + Le - we; //earth
-
   //True anomaly for Moon 
   xv = am * (cos(Em) - ecm);
   yv = am * (sqrt(1 - ecm * ecm) * sin(Em));
@@ -396,11 +390,8 @@ function Moon() {
   // Finding the radius vector of the planet
   rm = sqrt(xv * xv + yv * yv);
   //console.log('vm, vm_deg rm = ', vm, vm * degs, rm);
-  //These were the the moons position on the plane of
-  //its orbit
+  //These were the the moon's position on the plane of its orbit
   //Now,  convert to eclipitic coordinates
-
-
   //True anomaly for Sun 
   xvs = as * (cos(Es) - ecs);
   yvs = as * (sqrt(1 - ecs * ecs) * sin(Es));
@@ -435,10 +426,8 @@ function Moon() {
   console.log('Mean Longitude of the MOON : ', Lm);
   //
   //   distance terms earth radii
-  rm = rm - 0.58 * cos(Mm - 2 * d);
-  rm = rm - 0.46 * cos(2 * d);
-  rmkm = rm * 6378;
-    console.log('distância da Lua = ', rmkm);
+  rm = rm - 0.58 * cos(Mm - 2 * dm);
+  rm = rm - 0.46 * cos(2 * dm);
   //   next find the cartesian coordinates
   //   of the geocentric lunar position
   xg = rm * cos(lon) * cos(lat);
@@ -459,7 +448,7 @@ function Moon() {
   ze = yg * sin(ecl) + zg * cos(ecl); //   moons geocentric long and lat
   lon = atan2(yeclip, xeclip); //
   lat = atan2(zeclip, sqrt(xeclip * xeclip + yeclip * yeclip));
-  console.log('Moon lon, lat DEGS = ', lon * degs, lat * degs);
+  console.log('Moon lon, lat DEGS, Distance = ', lon * degs, lat * degs, rm * 6371);
   // 
   // for sun
   xes = xs;
@@ -548,7 +537,6 @@ function numeroDeDias() {
   let now = (new Date()).getTime();
   let stampj2001 = (new Date('1999-12-31T00:00:00Z')).getTime();
   //time for calculation date:
-  //
   let epoca = (now - stampj2001) / 1000;
   //console.log('epoca = ' + epoca);
   let numdias = epoca / 86400;
